@@ -3,6 +3,9 @@ package com.example.widetechdemo.controller;
 import com.example.widetechdemo.Exception.BusinessException;
 import com.example.widetechdemo.constants.ErrorCodeEnum;
 import com.example.widetechdemo.dao.entity.Employee;
+import com.example.widetechdemo.dto.request.Employee.CreateEmployeeReq;
+import com.example.widetechdemo.dto.request.Employee.DelEmployeeReq;
+import com.example.widetechdemo.dto.request.Employee.QueryEmployeeReq;
 import com.example.widetechdemo.dto.request.Employee.UpdateEmployeeReq;
 import com.example.widetechdemo.dto.response.RestResp;
 import com.example.widetechdemo.service.EmployeeService;
@@ -24,15 +27,15 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     @Operation(summary = "employee single query api")
-    public RestResp<Employee> getEmployeeById(@PathVariable int id) {
-        Employee employee = employeeService.getEmployeeById(id);
+    public RestResp<Employee> getEmployeeById(@RequestBody QueryEmployeeReq req) {
+        Employee employee = employeeService.getEmployeeById(req.getId());
         return employee != null ? RestResp.ok(employee) : RestResp.fail(ErrorCodeEnum.USER_NOT_EXIST, null);
     }
 
     @PostMapping
     @Operation(summary = "create new employee api")
-    public RestResp<Void> createEmployee(@RequestBody Employee req) {
-        Employee createdEmp = new Employee(req.getName(), req.getPosition(), req.getDepartment());
+    public RestResp<Void> createEmployee(@RequestBody CreateEmployeeReq req) {
+        Employee createdEmp = new Employee(req.getName(), req.getPosition(), req.getDept());
 
         try {
             employeeService.createEmployee(createdEmp);
@@ -53,9 +56,9 @@ public class EmployeeController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "delete employee api")
-    public RestResp<Void> deleteEmployee(@PathVariable int id) {
+    public RestResp<Void> deleteEmployee(@RequestBody DelEmployeeReq req) {
         try {
-            employeeService.deleteEmployee(id);
+            employeeService.deleteEmployee(req.getId());
         } catch (BusinessException e) {
             return RestResp.fail(ErrorCodeEnum.USER_NOT_EXIST);
         }
